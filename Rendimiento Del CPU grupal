@@ -1,0 +1,36 @@
+import psutil
+import paramiko
+
+def obtener_informacion_remota(hostname, username, password):
+    try:
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(hostname, username=username, password=password)
+
+        cpu_percent = psutil.cpu_percent()
+        memoria = psutil.virtual_memory()
+        temperatura = psutil.sensors_temperatures()
+
+        ssh.close()
+
+        return cpu_percent, memoria, temperatura
+
+    except Exception as e:
+        print("Error al conectar con {}: {}".format(hostname, e))
+        return None
+
+credenciales_maquina_1 = {'hostname': '192.168.1.101', 'username': 'usuario1', 'password': 'contraseña1'}
+credenciales_maquina_2 = {'hostname': '192.168.1.102', 'username': 'usuario2', 'password': 'contraseña2'}
+credenciales_maquina_3 = {'hostname': '192.168.1.103', 'username': 'usuario3', 'password': 'contraseña3'}
+
+info_maquina_1 = obtener_informacion_remota(**credenciales_maquina_1)
+info_maquina_2 = obtener_informacion_remota(**credenciales_maquina_2)
+info_maquina_3 = obtener_informacion_remota(**credenciales_maquina_3)
+
+if info_maquina_1:
+    print("Máquina 1:")
+    print("CPU: {}%".format(info_maquina_1[0]))
+    print("Memoria: {}".format(info_maquina_1[1]))
+    print("Temperatura: {}".format(info_maquina_1[2]))
+    print()
+    
